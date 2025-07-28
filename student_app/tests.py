@@ -5,7 +5,11 @@ from django.db import IntegrityError
 
 
 # Create your tests here.
+
+
+## PART I
 class Test_student(TestCase):
+
     def test_001_student_with_improper_good_student_field(self):
         try:
             new_student = Student.objects.create(
@@ -102,6 +106,95 @@ class Test_student(TestCase):
             locker_number=13,
             locker_combination="12-12-12",
             good_student=True,
+        )
+        new_student.full_clean()
+        self.assertIsNotNone(new_student)
+
+    # PART II
+
+    def test_007_student_with_repeated_student_email(self):
+        try:
+            Student.objects.create(
+                name="Johnny H. Harris",
+                student_email="thisIsMyEmail@school.com",
+                personal_email="myOtherEmail@gmail.com",
+                locker_number=119,
+                locker_combination="11-11-11",
+                good_student=False,
+            )
+            new_student = Student.objects.create(
+                name="Johnny H. Harris",
+                student_email="thisIsMyEmail@school.com",
+                personal_email="myEmail@gmail.com",
+                locker_number=109,
+                locker_combination="11-11-11",
+                good_student=False,
+            )
+            new_student.full_clean()
+            self.fail()
+        except IntegrityError as e:
+            # print("\n\n\n", e, "\n\n\n")
+            self.assertTrue(
+                'duplicate key value violates unique constraint "student_app_student_student_email'
+                in str(e)
+            )
+
+    def test_008_student_with_repeated_personal_email(self):
+        try:
+            Student.objects.create(
+                name="Johnny H. Harris",
+                student_email="thisIsMyOtherEmail@school.com",
+                personal_email="myEmail@gmail.com",
+                locker_number=119,
+                locker_combination="11-11-11",
+                good_student=False,
+            )
+            new_student = Student.objects.create(
+                name="Johnny H. Harris",
+                student_email="thisIsMyEmail@school.com",
+                personal_email="myEmail@gmail.com",
+                locker_number=109,
+                locker_combination="11-11-11",
+                good_student=False,
+            )
+            new_student.full_clean()
+            self.fail()
+        except IntegrityError as e:
+            # print("\n\n\n", e, "\n\n\n")
+            self.assertTrue(
+                'duplicate key value violates unique constraint "student_app_student_personal_email'
+                in str(e)
+            )
+
+    def test_009_student_with_repeated_locker_number(self):
+        try:
+            Student.objects.create(
+                name="Johnny H. Harris",
+                student_email="IsmyOEmail@school.com",
+                personal_email="otIsMyEmail@gmail.com",
+                locker_number=108,
+                locker_combination="11-11-11",
+                good_student=False,
+            )
+            new_student = Student.objects.create(
+                name="Johnny H. Harris",
+                student_email="IsyEmail@school.com",
+                personal_email="tIsMyEmail@gmail.com",
+                locker_number=108,
+                locker_combination="11-11-11",
+                good_student=False,
+            )
+            new_student.full_clean()
+            self.fail()
+        except IntegrityError as e:
+            # print(e)
+            self.assertTrue("student_app_student_locker_number" in str(e))
+
+    def test_010_student_utilizing_default_values(self):
+        new_student = Student.objects.create(
+            name="Maverick H. Macconnel",
+            student_email="mav@school.com",
+            personal_email="mav@gmail.com",
         )
         new_student.full_clean()
         self.assertIsNotNone(new_student)
