@@ -317,7 +317,7 @@ class Test_student(TestCase):
 
     def test_018_student_serializer_all_with_proper_data(self):
         try:
-            Subject.objects.create(subject_name="Python", professor="Professor Adam")
+            # Subject.objects.create(subject_name="Python", professor="Professor Adam")
             data = {
                 "name": "John W. Watson",
                 "student_email": "thisIsAnEmail@school.com",
@@ -325,38 +325,46 @@ class Test_student(TestCase):
                 "locker_number": 13,
                 "locker_combination": "12-33-44",
                 "good_student": True,
-                "subjects": [1],
+                "subjects": [
+                    {"id": 1, "subject_name": "Python", "professor": "Professor Adam"}
+                ],
             }
             serializer = StudentAllSerializer(data=data)
             self.assertTrue(serializer.is_valid())
         except Exception as e:
             print(serializer.errors)
+            self.fail()
 
     def test_019_student_serializer_all_with_proper_reponse(self):
         # Subject.objects.create(subject_name = "Python", professor = "Professor Adam")
-        stud = Student(
-            **{
-                "name": "John W. Watson",
-                "student_email": "thisIsAnEmail@school.com",
-                "personal_email": "thisIsAnEmail@gmail.com",
-                "locker_number": 13,
-                "locker_combination": "12-33-44",
-                "good_student": True,
-            }
-        )
-        serializer = StudentAllSerializer(stud)
-        self.assertEqual(
-            serializer.data,
-            {
-                "name": "John W. Watson",
-                "student_email": "thisIsAnEmail@school.com",
-                "personal_email": "thisIsAnEmail@gmail.com",
-                "locker_number": 13,
-                "locker_combination": "12-33-44",
-                "good_student": True,
-                "subjects": [],
-            },
-        )
+        try:
+            stud = Student(
+                **{
+                    "name": "John W. Watson",
+                    "student_email": "thisIsAnEmail@school.com",
+                    "personal_email": "thisIsAnEmail@gmail.com",
+                    "locker_number": 13,
+                    "locker_combination": "12-33-44",
+                    "good_student": True,
+                }
+            )
+            stud.save()
+            serializer = StudentAllSerializer(stud)
+            self.assertEqual(
+                serializer.data,
+                {
+                    "name": "John W. Watson",
+                    "student_email": "thisIsAnEmail@school.com",
+                    "personal_email": "thisIsAnEmail@gmail.com",
+                    "locker_number": 13,
+                    "locker_combination": "12-33-44",
+                    "good_student": True,
+                    "subjects": [],
+                },
+            )
+        except Exception as e:
+            print(e)
+            self.fail()
 
     # PART V
     def test_020_student_with_not_enough_classes(self):
