@@ -6,7 +6,7 @@ from subject_app.serializers import SubjectSerializer
 class StudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
-        fields = ["name", "student_email", "locker_number"]
+        fields = "__all__"
 
 
 class StudentAllSerializer(serializers.ModelSerializer):
